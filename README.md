@@ -33,7 +33,7 @@ def test_create_company_without_arguments_should_fail(client) -> None:
 اگه حتی از Pytest چیزی ندونید و فقط حداقل اطلاعاتی درمورد تست نویسی (و مفهوم assert) بدونید، مطمئنن این کد رو متوجه
 میشید!
 
-## مفاهیم اولیه
+## امکانات Pytest که در آینده باهاشون کار میکنیم!
 
 Fixture 🔸
 
