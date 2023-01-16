@@ -17,6 +17,10 @@ Pytest معروف ترین و محبوب ترین کتابخونه تست نوی
 
 به این تیکه کد نگاه کنید:
 
+</div>
+
+<div dir="ltr" align="left">
+
 ```python
 
 def test_create_company_without_arguments_should_fail(client) -> None:
@@ -109,7 +113,6 @@ def test_our_first_function() -> None:
 حالا جلوتر توضیح میدیم که چطور میتونید خروجی Pytest رو بهتر کنید و بفهمیدش :) فعلا بزارید فقط باهاش آشنا بشیم.
 
 
+
+
 </div>
-
-
-
