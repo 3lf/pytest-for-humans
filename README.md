@@ -139,6 +139,8 @@ def test_our_first_function() -> None:
 همونطور که گفتم باید یک حداقل دیتایی درمورد جنگو داشته باشید! پس من خیلی دستورات و مراحل کار رو توضیح نمیدم... فقط تیتر
 وار و خلاصه باهم پیش میریم.
 
+### قسمت ۱: راه‌اندازی پروژه جنگویی
+
 خب در اولین قدم ما پکیج های جنگو و جنگو رست فریمورک رو نصب میکنیم! (اگه بلد
 نیستید [اینجا](https://docs.djangoproject.com/en/4.1/topics/install/)
 و [اینجا](https://www.django-rest-framework.org/tutorial/quickstart/) رو بخونید!)
@@ -232,6 +234,31 @@ class CompanyViewSet(ModelVievSet):
 ```
 
 </div>
+
+
+
+<div dir="rtl" align="right">
+حالا در مرحله بعد مدل‌مون رو به پنل ادمین اضافه میکنیم. پس توی فایل admin.py:
+</div>
+
+<div dir="ltr" align="left">
+
+```python
+from django.contrib import admin
+
+from api.coronavstech.companies.models import Company
+
+
+@admin.register(Company)
+class CompanyAdmin(admin.ModelAdmin):
+    pass
+
+```
+
+</div>
+
+
+
 <div dir="rtl" align="right">
 
 به عنوان آخرین مرحله هم فایل `urls.py` اپ‌مون به این صورت میشه:
@@ -262,10 +289,9 @@ from django.urls import path, include
 from companies.urls import companies_router
 
 urtpatterns = [
-    path("admin/" *, adnin.site.urls),
+    path("admin/", admin.site.urls),
     path("", include(companies_router.urls))
 ]
 ```
 
 </div>
-
