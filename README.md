@@ -6,7 +6,8 @@
 
 <div dir="rtl" align="right">
 
- پای‌تست معروف ترین و محبوب ترین کتابخونه تست‌نویسی پایتون هست که توی این صفحه میخوام با کمک گرفتن از چندین منبع به زبون آدمی زاد اون رو بهتون یاد بدم!
+پای‌تست معروف ترین و محبوب ترین کتابخونه تست‌نویسی پایتون هست که توی این صفحه میخوام با کمک گرفتن از چندین منبع به زبون
+آدمی زاد اون رو بهتون یاد بدم!
 
 ## ویژگی های اصلی
 
@@ -140,7 +141,7 @@ def test_our_first_function() -> None:
 
 <div dir="rtl" align="center">
 
-#  با یک پروژه واقعی تست‌نویسی رو یاد بگیریم!
+# با یک پروژه واقعی تست‌نویسی رو یاد بگیریم!
 
 </div>
 
@@ -315,5 +316,251 @@ urtpatterns = [
 
 ## قسمت ۲: شروع تست‌نویسی
 
+بیاین اول یک نگاه کوچیک بکنیم به اینکه اگه پای‌تست نباشه و بخوایم با unittest تست بنویسیم، چطوری باید تست بنویسیم؟
+
 </div>
 
+<div dir="ltr" align="left">
+
+```python
+from django.urls import reverse
+from django.test import Client
+from unittest import TestCase
+
+
+class TestGetCompanies(TestCase):
+    def setUp(self) -> None:
+        self.client = Client()
+        self.companies_url = reverse("companies-list")
+
+    def tearDown(self) -> None:
+        pass
+
+    def test_zero_companies_should_return_empty_list(self) -> None:
+        response = self.client.get(self.companies_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), [])
+```
+
+</div>
+
+
+<div dir="rtl" align="right">
+
+خب یکم زشته نه؟ اولا که نیاز در قابل یک کلاس تست بنویسیم! دوم نیاز به setUp و tearDown داریم! برای مقایسه هم باید عبارت
+طولانی مثل self.assertEqual رو اونم بصورت یک تابع بنویسید! خب من به شخصه اصلا خوشم نیومد!
+
+</div>
+
+<div dir="ltr" align="left">
+
+```python
+import pytest
+from django.urls import reverse
+
+companies_url = reverse("companies-list")
+
+
+@pytest.mark.django_db
+def test_zero_companies_should_return_empty_list(client) -> None:
+    response = client.get(companies_url)
+    assert response.status_code == 200
+    assert json.loads(response.content) == []
+
+```
+
+</div>
+
+<div dir="rtl" align="right">
+
+به همین جذابی! حتی client رو هم خودش برامون ساخت! (با کمک پلاگین pytest-django)
+
+دکمه دیگه اینکه با یک assert ساده میتونیم از عملگر های پایتون (مثل برابر، کمتر و بیشتر) استفاده کنیم!
+
+خب حالا که فهمیدید چی به چیه بریم باهم استارت بزنیم!
+
+### نصب pytest-django
+
+اول با دستور پایین نصبش میکنیم:
+
+
+</div>
+
+<div dir="ltr" align="left">
+
+```
+pip install pytest-django
+```
+
+</div>
+
+<div dir="rtl" align="right">
+
+بعد توی فایل `pytest.ini` که توی روت پروژه باید ایجاد بشه، این خط رو اضافه میکنیم(ProjectName اسم پوشه ای هست که setting
+ما درونش هست):
+
+</div>
+
+<div dir="ltr" align="left">
+
+```
+[pytest]
+DJANGO_SETTINGS_MODULE = ProjectName.settings
+```
+
+</div>
+
+<div dir="rtl" align="right">
+
+حالا میتونیم با دستور `pytest` تست ها رو اجرا کنیم!
+
+### تست های مختلف برای پروژه‌امون بنویسیم!
+
+خب اولین تستی که برای مثال نوشتیم رو یادتونه ؟
+
+</div>
+
+
+<div dir="ltr" align="left">
+
+```python
+import pytest
+from django.urls import reverse
+
+companies_url = reverse("companies-list")
+
+
+@pytest.mark.django_db
+def test_zero_companies_should_return_empty_list(client) -> None:
+    response = client.get(companies_url)
+    assert response.status_code == 200
+    assert json.loads(response.content) == []
+
+```
+
+</div>
+
+
+<div dir="rtl" align="right">
+
+خب این تست یک تست هست که بررسی میکنه اگر هیچ کمپانی در دیتابیس نباشه ای پی ای ما، لیست خالی برگردونه!
+اولین نکته اینه که companies-list به این علت هست که ما وقتی از Viewset استفاده میکنیم مقدار url_name رو به صورت
+`[model_name]-list` میذاریم. این مقدار رو میتونید از داکیومنت DRF ببینید.
+که ادرسش اینجاست: https://www.django-rest-framework.org/api-guide/routers/#simplerouter
+
+نکته دوم اینکه ما از دیتابیس استفاده میکنیم و برای فعال کردن دیتابیس از دکوریتور @pytest.mark.django_db استفاده کردیم که
+اول یک دیتابیس تستی کوچولو میسازه و بعد از تست پاک میکنه. این نکته مهمه که این دیتابیس از دیتابیس اصلی پروژمون جدا هست!
+
+نکته سوم اینکه ما از client استفاده کردیم که از پلاگین pytest-django میاد. این کلاینت یک کلاینت تستی هست که میتونه تست
+های ما رو اجرا کنه. این کلاینت از کلاس APIClient که از django.test.Client میاد استفاده میکنه.
+
+و آخرین نکته هم اینه که ما از json.loads استفاده کردیم که یک تابعی هست که یک رشته استرینگ بصورت جیسون رو به یک دیکشنری
+تبدیل میکنه.
+
+خب حالا برای اینکه تست های ما اجرا بشن، میتونیم از دستور `pytest` استفاده کنیم.
+
+</div>
+
+<div dir="ltr" align="left">
+
+```python
+import pytest
+from django.urls import reverse
+
+from api.coronavstech.companies.models import Company
+
+companies_url = reverse("companies-list")
+pytestmark = pytest.mark.django_db
+
+
+def test_one_company_exists_should_succeed(client) -> None:
+    test_company = Company.objects.create(name="Amazon")
+    response = client.get(companies_url)
+    response_content = json.loads(response.content)[0]
+    assert response.status_code == 200
+    assert response_content.get("name") == test_company.name
+    assert response_content.get("status") == "Hiring"
+    assert response_content.get("application_link") == ""
+    assert response_content.get("notes") == ""
+
+```
+
+</div>
+
+<div dir="rtl" align="right">
+
+خب این تست هم مشابه تست قبلیه. تفاوتش اینه که این تست یک کمپانی رو در دیتابیس میسازه و بعد از اجرای تست، این کمپانی رو
+پاک میکنه.
+
+خب پس بر پایه این تست یاد گرفتیم که میتونیم یک ابجکت رو با ORM بسازیم و بعدش ای پی ای رو تست کنیم!
+
+تنها نکته این تست اینه که بجای دکوریتور از `pytestmark = pytest.mark.django_db` استفاده کردیم! این کد میگه این دکوریتور
+رو به همه تستایی که توی این صفحه هستن اضافه کن! پس کارمون یک پله راحت تر شد!
+
+
+<br>
+<br>
+
+حالا میخوایم تست هایی که مربوط به ساخت یک کمپانی هست رو بنویسیم... دیگه نمیام جداشون کنم همه رو یکجا ببینید :)
+
+</div>
+
+<div dir="ltr" align="left">
+
+```python
+def test_create_company_without_arguments_should_fail(client) -> None:
+    response = client.post(path=companies_url)
+    assert response.status_code == 400
+    assert json.loads(response.content) == {"name": ["This field is required."]}
+
+
+def test_create_existing_company_should_fail(client) -> None:
+    Company.objects.create(name="apple")
+    response = client.post(path=companies_url, data={"name": "apple"})
+    assert response.status_code == 400
+    assert json.loads(response.content) == {
+        "name": ["company with this name already exists."]
+    }
+
+
+def test_create_company_with_only_name_all_fields_should_be_default(client) -> None:
+    response = client.post(path=companies_url, data={"name": "test company name"})
+    assert response.status_code == 201
+    response_content = response.json()
+    assert response_content.get("name") == "test company name"
+    assert response_content.get("status") == "Hiring"
+    assert response_content.get("application_link") == ""
+    assert response_content.get("notes") == ""
+
+
+def test_create_company_with_layoffs_status_should_succeed(client) -> None:
+    response = client.post(
+        path=companies_url,
+        data={"name": "test company name", "status": "Layoffs"},
+    )
+    assert response.status_code == 201
+    response_content = json.loads(response.content)
+    assert response_content.get("status") == "Layoffs"
+
+
+def test_create_company_with_wrong_status_should_fail(client) -> None:
+    response = client.post(
+        path=companies_url,
+        data={"name": "test company name", "status": "WrongStatus"},
+    )
+    assert response.status_code == 400
+    assert "WrongStatus" in str(response.content)
+    assert "is not a valid choice" in str(response.content)
+
+```
+
+</div>
+
+
+<div dir="rtl" align="right">
+بنظرم همشون مشابه قبلیا هستن و فقط با خوندشون میتونید یاد بگیرید که چطوری یک ابجکت رو با ای پی ای بسازید و چطوری
+تست کنید که این ابجکت درست ساخته شده یا نه! و این نکته مهمه که شرایط خاص مثل اینکه نمیتونیم چند کمپانی با یک تست داشته باشیم و یا مقدار خالی برای ساخت کمپانی درست نیست رو تست کنیم
+
+اگر مشکلی داشتید میتونید از من بپرسید! (issue یا alinajafi321@gmail.com)
+
+</div>
