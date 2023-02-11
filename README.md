@@ -567,4 +567,130 @@ def test_create_company_with_wrong_status_should_fail(client) -> None:
 
 اگر مشکلی داشتید میتونید از من بپرسید! (issue یا alinajafi321@gmail.com)
 
+# یادگرفتن Parametrize با طعم فیبوناچی
+
+خب احتمالا با مساله معروف فیبوناچی آشنا هستید! این مساله یک مساله ریاضیه که این مقادیر رو بر میگردونه:
+
+0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89,144,233,377,610,987,...
+
+اگه نمیدونید چیه و چطوری حساب میشه اینجا ببینید:
+
+https://en.wikipedia.org/wiki/Fibonacci_number
+
+خب اول بیاید به ساده ترین روشش که بازگشتی هست نگاه کنیم:
+
+</div>
+<div dir="ltr" align="left">
+
+```python
+def fibonacci_naive(n: int) -> int:
+    if (n == 0) or (n == 1):
+        return n
+    return fibonacci_naive(n - 2) + fibonacci_naive(n - 1)
+```
+
+</div>
+
+<div dir="rtl" align="right">
+
+حالا اگه بخوایم براش تست بنویسیم به این صورت باید عمل کنیم:
+
+</div>
+
+<div dir="ltr" align="left">
+
+```python
+def test_naive() -> None:
+    res = fibonacci_naive(n=0)
+    assert res == 0
+
+    res = fibonacci_naive(n=1)
+    assert res == 1
+
+    res = fibonacci_naive(n=2)
+    assert res == 1
+
+    res = fibonacci_naive(n=21)
+    assert res == 6765
+```
+
+</div>
+
+<div dir="rtl" align="right">
+
+این یک تست خوبه ولی تکرار کد توش خیلی به چشم میاد، قبول دارین؟
+
+برای حل این مشکل میتونیم از یک تکنیک به نام Parameterized Test استفاده کنیم.
+
+این تکنیک یک تکنیکیه که میتونیم با استفاده از `@pytest.mark.parametrize` بجای اینکه یک تکه کد رو برای مقادیر مختلف کپی
+کنیم، یک تابع رو چندین بار با مقادیر مختلف اجرا کنیم!
+
+به این نمونه توجه کنید:
+
+</div>
+
+<div dir="ltr" align="left">
+
+```python
+@pytest.mark.parametrize("n, expected", [(0, 0), (1, 1), (2, 1), (20, 6765)])
+def test_naive(n: int, expected: int) -> None:
+    res = fibonacci_naive(n=n)
+    assert res == expected
+```
+
+</div>
+
+<div dir="rtl" align="right">
+
+مقدار اول هر مجموعه همون مقدار `n` هست و مقدار دوم هر مجموعه `expected` هست که به عنوان ورودی تابع تستمون میاد!
+
+خب بیاین فرض کنید ما دو تا تابع برای محاسبه فیبوناچی داریم، مثلا میخوایم یک تابع قابلیت کش کردن با lru هم داشته باشه!
+
+اول بیاین اون تابع رو بنویسیم:
+
+</div>
+
+<div dir="ltr" align="left">
+
+```python
+
+@lru_cache(maxsize=1024)
+def fibonacci_lru(n: int) -> int:
+    if (n == 0) or (n == 1):
+        return n
+    return fibonacci_lru(n - 2) + fibonacci_lru(n - 1)
+
+```
+
+</div>
+
+<div dir="rtl" align="right">
+
+
+حالا بیاین تست بنویسیم و در قالب یک تست هم فیبو ناچی ساده رو تست کنیم هم فیبوناچی با کش رو:
+
+</div>
+
+<div dir="ltr" align="left">
+
+```python
+@pytest.mark.parametrize("n, expected", [(0, 0), (1, 1), (2, 1), (20, 6765)])
+@pytest.mark.parametrize("fib_function", [fibonacci_naive, fibonacci_lru])
+def test_fibonacci(fib_function: Callable[[int], int], n: int, expected: int) -> None:
+    res = fib_function(n)
+    assert res == expected
+```                         
+
+</div>
+
+<div dir="rtl" align="right">
+
+
+بیاین خروجی باحالش رو با کمک `pytest -v` ببینیم(-v کمک میکنه تا خروجی کامل تری ببینیم):
+
+![](images/result_of_parametrize.png "Result of Parametrize")
+
+خب اینجا میبینیم که تست های ما با موفقیت اجرا شدن و همچنین میبینیم که تست های ما با کش هم اجرا شدن و با کش هم موفقیت
+آمیز بودن!
+
 </div>
