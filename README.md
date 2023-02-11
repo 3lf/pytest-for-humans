@@ -1,6 +1,6 @@
 <div dir="rtl" align="center">
 
-# تست‌نویسی در Pytest برای آدمیزاد !
+# تست‌نویسی در Pytest به زبون آدمیزاد !
 
 </div>
 
